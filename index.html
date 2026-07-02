@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>スクラッチ かいぞう ツール</title>
-  <link rel="stylesheet" href="style.css">
+  <link class="cache-buster" rel="stylesheet" href="style.css?v=1.0.3">
   <!-- Google Fonts: Outfit, Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -139,7 +139,7 @@
                 <p>👉 ファイルをアップロードする場合は、チャットの **「＋（プラス）」** マークからえらんでね！</p>
                 <p>👉 コピペする場合は、マウス右クリックの <strong>「貼り付け」</strong> か、キーボードの <strong>「Ctrl + V」</strong> をおしてね！</p>
               </div>
-              <p class="wait-text">AIがプログラムをつくってくれたら、そのファイルまたはテキストを下にいれてね。</p>
+              <p class="wait-text">AIがプログラムをつくってくれたら、そのプログラム（JSONコード）またはファイルを下にいれてね。</p>
               <div class="truncation-advice-box">
                 <strong>💡 プログラムが とちゅうで切れちゃったときは？</strong>
                 <p>AIのチャットに <span>「プログラムがとちゅうで切れているよ。つづきを書いてね」</span> とお願いすると、のこりの部分を書いてくれます！</p>
@@ -149,17 +149,17 @@
             <!-- 修正プログラムの入力カード (ドラッグ＆ドロップ対応) -->
             <div class="card card-rebuild">
               <div class="card-header header-rebuild">
-                <h3>🔄 AIがくれたプログラム（ファイルまたはテキスト）をいれる</h3>
+                <h3>🔄 AIがくれたプログラム（JSONコードまたはファイル）をいれる</h3>
                 <button id="download-sb3-btn" class="btn btn-success">ファイルをダウンロードする</button>
               </div>
               <div class="card-body">
                 <!-- ファイル読み込み用ドロップゾーン -->
                 <div id="json-drop-zone" class="json-drop-zone">
-                  <span>📄</span> AIがくれたテキストファイルをここにドロップするか、ここをクリックしてえらんでね
-                  <input type="file" id="json-file-input" accept=".txt,.json" class="hidden">
+                  <span>📄</span> AIがくれたプログラムファイル（modified_project.jsonなど）をここにドロップするか、ここをクリックしてえらんでね
+                  <input type="file" id="json-file-input" accept=".json,.txt" class="hidden">
                 </div>
-                <div class="or-divider">またはテキストを直接はる</div>
-                <textarea id="modified-json-input" class="json-textarea" placeholder="AIが返してくれたプログラム（JSONコード）をここに貼りつけてもいいよ..."></textarea>
+                <div class="or-divider">またはJSONプログラムを直接はる</div>
+                <textarea id="modified-json-input" class="json-textarea" placeholder="AIが返してくれたプログラム（JSONコード）をここに貼りつけてね..."></textarea>
               </div>
             </div>
           </div>
@@ -189,6 +189,6 @@
     </footer>
   </div>
 
-  <script src="app.js?v=1.0.2"></script>
+  <script src="app.js?v=1.0.3"></script>
 </body>
 </html>

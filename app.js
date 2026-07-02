@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 2. 出力する文字数を極限まで少なくして途中で切れるのを防ぐため、以下のルールを必ず守ってください：
    - 変更（修正・改造）を加えたスプライトのみ、プログラム（blocks）を正しく記述してください。
    - 変更のない（元のプログラムのままでよい）スプライトは、プログラム（blocks）の中身を空オブジェクト \`{}\` に省略してください。
-3. 「はい、直しました」などのあいさつや、プログラムの説明は、一切書かないでください。
+3. 「はい、直しました」などのあいさつや説明、余計なテキストは一切書かないでください。
 4. 出力するJSONコードは、以下のように \`\`\`json と \`\`\` でかこんで直接チャットに出力してください。
 
 \`\`\`json
@@ -511,18 +511,30 @@ ${slimJsonText}
     const backtickCount = (rawJsonInput.match(/```/g) || []).length;
     const isUnfinishedCodeBlock = rawJsonInput.includes('```') && (backtickCount % 2 !== 0);
 
-    // ```json と ``` を取り除くクレンジング処理
+    // ==========================================
+    // 超堅牢クレンジング処理（AIの様々な出力崩れを自動修復）
+    // ==========================================
     let cleansedJson = rawJsonInput;
+
+    // 1. コードブロックが埋め込まれている場合、その中身を抽出
     if (cleansedJson.includes('```')) {
-      const match = cleansedJson.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      const match = cleansedJson.match(/```(?:json|python)?\s*([\s\S]*?)\s*```/i);
       if (match && match[1]) {
         cleansedJson = match[1].trim();
       } else {
-        cleansedJson = cleansedJson.replace(/```(?:json)?/g, '').replace(/```/g, '').trim();
+        cleansedJson = cleansedJson.replace(/```(?:json|python)?/gi, '').replace(/```/g, '').trim();
       }
     }
 
-    // クレンジング後の末尾文字が閉じ括弧でないか検知
+    // 2. Pythonコードの中にJSONが文字列として格納されていたり、
+    // 前後に挨拶文などのゴミテキストが残っている場合、最初の { から 最後の } までをJSONとして切り出す
+    const firstBrace = cleansedJson.indexOf('{');
+    const lastBrace = cleansedJson.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      cleansedJson = cleansedJson.substring(firstBrace, lastBrace + 1).trim();
+    }
+
+    // クレンジング後の末尾文字が閉じ括弧でないか検知 (途切れ検知)
     const lastChar = cleansedJson.charAt(cleansedJson.length - 1);
     const isUnfinishedJson = lastChar !== '}' && lastChar !== ']';
 
@@ -638,7 +650,7 @@ ${slimJsonText}
 
     // JSONドロップゾーンのリセット
     jsonDropZone.innerHTML = `
-      <span>📄</span> AIがくれたテキストファイルをここにドロップするか、ここをクリックしてえらんでね
+      <span>📄</span> AIがくれたプログラムファイル（modified_project.jsonなど）をここにドロップするか、ここをクリックしてえらんでね
     `;
     jsonDropZone.style.borderColor = 'var(--border-color)';
     jsonDropZone.style.backgroundColor = 'transparent';
