@@ -884,6 +884,60 @@ select:focus {
   }
 }
 
+/* Gemini起動ボックス */
+.gemini-launch-box {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  background-color: rgba(139, 92, 246, 0.03);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gemini-launch-box .launch-title {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.gemini-launch-box .launch-btn {
+  background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+  border: none;
+  color: #fff;
+  padding: 0.7rem 1.8rem;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: var(--font-title);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.gemini-launch-box .launch-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #5a52e6, #966df7);
+}
+
+.gemini-launch-box .launch-btn:active {
+  transform: translateY(0);
+}
+
+.gemini-launch-box .launch-tip {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+
 
 
 

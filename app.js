@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const promptOutput = document.getElementById('prompt-output');
   const copyPromptBtn = document.getElementById('copy-prompt-btn');
   const downloadPromptBtn = document.getElementById('download-prompt-btn');
+  const launchGeminiBtn = document.getElementById('launch-gemini-btn');
 
   // STEP 4 エレメント
   const modifiedJsonInput = document.getElementById('modified-json-input');
@@ -376,8 +377,6 @@ ${slimJsonText}
         copyPromptBtn.textContent = 'コピーできたよ！ ✓';
         copyPromptBtn.classList.add('copied');
         
-        handleStep3Transition();
-
         setTimeout(() => {
           copyPromptBtn.textContent = origText;
           copyPromptBtn.classList.remove('copied');
@@ -407,12 +406,25 @@ ${slimJsonText}
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // 遷移処理を実行
-      handleStep3Transition();
+      // 保存完了の視覚フィードバック
+      const origText = downloadPromptBtn.textContent;
+      downloadPromptBtn.textContent = '保存できたよ！ ✓';
+      downloadPromptBtn.classList.add('copied');
+      setTimeout(() => {
+        downloadPromptBtn.textContent = origText;
+        downloadPromptBtn.classList.remove('copied');
+      }, 2000);
 
     } catch (err) {
       alert('ファイルの保存にしっぱいしたよ: ' + err.message);
     }
+  });
+
+  // Geminiをひらくボタン
+  launchGeminiBtn.addEventListener('click', () => {
+    window.open('https://gemini.google.com/', '_blank');
+    // Geminiをひらいたタイミングで次のステップ（STEP 4）へ遷移する
+    handleStep3Transition();
   });
 
   function handleStep3Transition() {
