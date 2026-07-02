@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スクラッチ かいぞう ツール</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts: Outfit, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- JSZip CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+  <div class="background-decor decor-1"></div>
+  <div class="background-decor decor-2"></div>
+  
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">🐱</span>
+        <h1>スクラッチ かいぞう ツール</h1>
+      </div>
+      <p class="subtitle">1つずつじゅんばんに進めるだけで、スクラッチをかんたんに改造（かいぞう）できるよ！</p>
+    </header>
+
+    <main class="app-main">
+      <div class="steps-flow">
+        
+        <!-- STEP 1: ファイルよみこみ -->
+        <div id="step-1" class="step-card active">
+          <div class="step-header">
+            <span class="step-badge">STEP 1</span>
+            <h2>スクラッチのファイルをよみこもう！</h2>
+            <span class="step-status-icon">⏳</span>
+          </div>
+          <div class="step-body">
+            <section class="upload-section">
+              <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-content">
+                  <span class="upload-icon">📥</span>
+                  <h3>ここにスクラッチのファイル（.sb3）をドロップしてね</h3>
+                  <p>またはここをクリックしてファイルをえらんでね</p>
+                  <input type="file" id="file-input" accept=".sb3" class="hidden">
+                </div>
+              </div>
+              <div id="file-info" class="file-info-container"></div>
+            </section>
+          </div>
+        </div>
+
+        <!-- STEP 2: しつもん選択 -->
+        <div id="step-2" class="step-card disabled">
+          <div class="step-header">
+            <span class="step-badge">STEP 2</span>
+            <h2>AIにききたいことをえらぼう！</h2>
+            <span class="step-status-icon"></span>
+          </div>
+          <div class="step-body">
+            <div class="control-panel">
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="template" value="bug-find">
+                  <span class="radio-text">🐛 バグ（うごかないところ）のばしょを教えてもらう (お返事: ぶんしょう)</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="template" value="bug-fix">
+                  <span class="radio-text">🔧 バグ（うごかないところ）をなおしてもらう (お返事: プログラム)</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="template" value="improve">
+                  <span class="radio-text">🚀 もっとおもしろくするアイデアとプログラムをもらう (お返事: プログラム)</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="template" value="explain">
+                  <span class="radio-text">📖 どうやってうごいているか教えてもらう (お返事: ぶんしょう)</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="template" value="custom-ask">
+                  <span class="radio-text">❓ しつもんしたいことを書く (お返事: ぶんしょう)</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="template" value="custom-fix">
+                  <span class="radio-text">🛠️ なおしてほしい・かいぞうしてほしいことを書く (お返事: プログラム)</span>
+                </label>
+              </div>
+            </div>
+            <div id="custom-question-container" class="custom-question-container hidden">
+              <textarea id="custom-question" class="custom-question" placeholder="AIにききたいことをここに書いてね..."></textarea>
+              <button id="custom-submit-btn" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">これで決定する！ ➔</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: プロンプトコピー -->
+        <div id="step-3" class="step-card disabled">
+          <div class="step-header">
+            <span class="step-badge">STEP 3</span>
+            <h2>AIにわたすテキストをコピーしよう！</h2>
+            <span class="step-status-icon"></span>
+          </div>
+          <div class="step-body">
+            <p class="step-instruction">「コピーする」ボタンをおして、GeminiなどのAIに貼りつけてしつもんしてね。</p>
+            <div class="card">
+              <div class="card-header header-highlight">
+                <h3>💡 AIにわたすテキスト</h3>
+                <button id="copy-prompt-btn" class="btn btn-primary">コピーする</button>
+              </div>
+              <div class="card-body">
+                <pre id="prompt-output" class="code-preview prompt-preview"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: 再エンコード -->
+        <div id="step-4" class="step-card disabled hidden">
+          <div class="step-header">
+            <span class="step-badge">STEP 4</span>
+            <h2>なおしたファイルをダウンロードしよう！</h2>
+            <span class="step-status-icon"></span>
+          </div>
+          <div class="step-body">
+            
+            <!-- AIチャットへの貼り付けガイド -->
+            <div class="paste-guide-box">
+              <p class="highlight-text">💬 AIのチャットの入力らんに、コピーした文章を貼りつけよう！</p>
+              <div class="paste-tips">
+                <p>👉 マウスの右クリックで <strong>「貼り付け（ペースト）」</strong> をえらぶか、</p>
+                <p>👉 キーボードの <strong>「Ctrl（コントロール）」</strong> をおしながら <strong>「V」</strong> をおしてね！</p>
+              </div>
+              <p class="wait-text">AIがプログラムをつくってくれたら、それをコピーして下の入力らんに貼りつけてね。</p>
+              <div class="truncation-advice-box">
+                <strong>💡 プログラムが とちゅうで切れちゃったときは？</strong>
+                <p>AIのチャットに <span>「プログラムがとちゅうで切れているよ。つづきを書いてね」</span> とお願いすると、のこりの部分を書いてくれます！</p>
+              </div>
+            </div>
+
+            <div class="card card-rebuild">
+              <div class="card-header header-rebuild">
+                <h3>🔄 AIがなおしてくれたプログラムをはる</h3>
+                <button id="download-sb3-btn" class="btn btn-success">ファイルをダウンロードする</button>
+              </div>
+              <div class="card-body">
+                <textarea id="modified-json-input" class="json-textarea" placeholder="AIが返してくれたプログラム（JSON）をここに貼りつけてね..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- お祝いメッセージ (文章返信時) -->
+        <div id="completion-message" class="completion-card hidden">
+          <span class="celebrate-icon">🎉</span>
+          <h2>これでじゅんびOK！</h2>
+          <p>AIの先生にコピーしたテキストをわたして、しつもんしてみてね！</p>
+          <button class="btn btn-secondary reset-btn" style="margin-top: 1.5rem;"><span class="reset-icon">🔁</span> 別のプログラムでもう一度！</button>
+        </div>
+
+        <!-- ダウンロード完了メッセージ -->
+        <div id="download-completion-message" class="completion-card hidden">
+          <span class="celebrate-icon">✨</span>
+          <h2>ダウンロードできたよ！</h2>
+          <p>スクラッチでなおしたファイルをひらいて、うごかしてみてね！</p>
+          <button class="btn btn-secondary reset-btn" style="margin-top: 1.5rem;"><span class="reset-icon">🔁</span> 別のプログラムでもう一度！</button>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>© 2026 スクラッチ かいぞう ツール. Built for Advanced Agentic Coding.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
