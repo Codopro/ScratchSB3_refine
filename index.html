@@ -97,15 +97,18 @@
         <div id="step-3" class="step-card disabled">
           <div class="step-header">
             <span class="step-badge">STEP 3</span>
-            <h2>AIにわたすテキストをコピーしよう！</h2>
+            <h2>AIにわたすテキストを用意しよう！</h2>
             <span class="step-status-icon"></span>
           </div>
           <div class="step-body">
-            <p class="step-instruction">「コピーする」ボタンをおして、GeminiなどのAIに貼りつけてしつもんしてね。</p>
+            <p class="step-instruction">「しつもんファイルを保存する」でお手元のパソコンに保存してAIのチャットにアップロードするか、「コピーする」で文字をコピーしてね。</p>
             <div class="card">
               <div class="card-header header-highlight">
                 <h3>💡 AIにわたすテキスト</h3>
-                <button id="copy-prompt-btn" class="btn btn-primary">コピーする</button>
+                <div class="action-buttons">
+                  <button id="download-prompt-btn" class="btn btn-secondary">📄 しつもんファイルを保存する</button>
+                  <button id="copy-prompt-btn" class="btn btn-primary">📋 コピーする</button>
+                </div>
               </div>
               <div class="card-body">
                 <pre id="prompt-output" class="code-preview prompt-preview"></pre>
@@ -125,25 +128,32 @@
             
             <!-- AIチャットへの貼り付けガイド -->
             <div class="paste-guide-box">
-              <p class="highlight-text">💬 AIのチャットの入力らんに、コピーした文章を貼りつけよう！</p>
+              <p class="highlight-text">💬 AIのチャットの入力らんに、コピーした文章を貼りつけるか、さっき保存したテキストファイルをアップロードしてね！</p>
               <div class="paste-tips">
-                <p>👉 マウスの右クリックで <strong>「貼り付け（ペースト）」</strong> をえらぶか、</p>
-                <p>👉 キーボードの <strong>「Ctrl（コントロール）」</strong> をおしながら <strong>「V」</strong> をおしてね！</p>
+                <p>👉 ファイルをアップロードする場合は、チャットの **「＋（プラス）」** マークからえらんでね！</p>
+                <p>👉 コピペする場合は、マウス右クリックの <strong>「貼り付け」</strong> か、キーボードの <strong>「Ctrl + V」</strong> をおしてね！</p>
               </div>
-              <p class="wait-text">AIがプログラムをつくってくれたら、それをコピーして下の入力らんに貼りつけてね。</p>
+              <p class="wait-text">AIがプログラムをつくってくれたら、そのファイルまたはテキストを下にいれてね。</p>
               <div class="truncation-advice-box">
                 <strong>💡 プログラムが とちゅうで切れちゃったときは？</strong>
                 <p>AIのチャットに <span>「プログラムがとちゅうで切れているよ。つづきを書いてね」</span> とお願いすると、のこりの部分を書いてくれます！</p>
               </div>
             </div>
 
+            <!-- 修正プログラムの入力カード (ドラッグ＆ドロップ対応) -->
             <div class="card card-rebuild">
               <div class="card-header header-rebuild">
-                <h3>🔄 AIがなおしてくれたプログラムをはる</h3>
+                <h3>🔄 AIがくれたプログラム（ファイルまたはテキスト）をいれる</h3>
                 <button id="download-sb3-btn" class="btn btn-success">ファイルをダウンロードする</button>
               </div>
               <div class="card-body">
-                <textarea id="modified-json-input" class="json-textarea" placeholder="AIが返してくれたプログラム（JSON）をここに貼りつけてね..."></textarea>
+                <!-- ファイル読み込み用ドロップゾーン -->
+                <div id="json-drop-zone" class="json-drop-zone">
+                  <span>📄</span> AIがくれたテキストファイルをここにドロップするか、ここをクリックしてえらんでね
+                  <input type="file" id="json-file-input" accept=".txt,.json" class="hidden">
+                </div>
+                <div class="or-divider">またはテキストを直接はる</div>
+                <textarea id="modified-json-input" class="json-textarea" placeholder="AIが返してくれたプログラム（JSONコード）をここに貼りつけてもいいよ..."></textarea>
               </div>
             </div>
           </div>
@@ -153,7 +163,7 @@
         <div id="completion-message" class="completion-card hidden">
           <span class="celebrate-icon">🎉</span>
           <h2>これでじゅんびOK！</h2>
-          <p>AIの先生にコピーしたテキストをわたして、しつもんしてみてね！</p>
+          <p>AIの先生にしつもんファイルをアップロードするか、テキストをコピーしてわたしてみてね！</p>
           <button class="btn btn-secondary reset-btn" style="margin-top: 1.5rem;"><span class="reset-icon">🔁</span> 別のプログラムでもう一度！</button>
         </div>
 

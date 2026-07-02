@@ -27,10 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // STEP 3 エレメント
   const promptOutput = document.getElementById('prompt-output');
   const copyPromptBtn = document.getElementById('copy-prompt-btn');
+  const downloadPromptBtn = document.getElementById('download-prompt-btn');
 
   // STEP 4 エレメント
   const modifiedJsonInput = document.getElementById('modified-json-input');
   const downloadSb3Btn = document.getElementById('download-sb3-btn');
+  const jsonDropZone = document.getElementById('json-drop-zone');
+  const jsonFileInput = document.getElementById('json-file-input');
 
   // 完了メッセージ
   const completionMessage = document.getElementById('completion-message');
@@ -328,7 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
    - 変更（修正・改造）を加えたスプライトのみ、プログラム（blocks）を正しく記述してください。
    - 変更のない（元のプログラムのままでよい）スプライトは、プログラム（blocks）の中身を空オブジェクト \`{}\` に省略して出力してください。
 3. 「はい、直しました」などのあいさつや、プログラムの説明は、一切書かないでください。
-4. 出力するJSONコードは、以下のように \`\`\`json と \`\`\` でかこんで出力してください。
+4. 可能であれば、なおしたプログラム（JSONコード）を「modified_project.txt」というテキストファイルとして書き出せるように出力してください。
+5. ファイルとしての出力がむずかしい場合は、以下のように \`\`\`json と \`\`\` でかこんでJSONデータのみをチャットに出力してください。
 
 \`\`\`json
 [ここになおしたJSONデータだけを入れてね]
@@ -364,7 +368,7 @@ ${slimJsonText}
   }
 
   // ==========================================
-  // STEP 3: コピー処理 & 状態遷移
+  // STEP 3: コピー処理 ＆ ファイル保存 ＆ 状態遷移
   // ==========================================
   copyPromptBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(promptOutput.textContent)
@@ -373,26 +377,7 @@ ${slimJsonText}
         copyPromptBtn.textContent = 'コピーできたよ！ ✓';
         copyPromptBtn.classList.add('copied');
         
-        // 状態遷移: STEP 3 完了
-        setStepState(3, 'completed');
-
-        const selectedRadio = document.querySelector('input[name="template"]:checked');
-        const selectedTemplate = selectedRadio ? selectedRadio.value : 'bug-find';
-        const isCodeOutput = (selectedTemplate === 'bug-fix' || selectedTemplate === 'improve' || selectedTemplate === 'custom-fix');
-
-        if (isCodeOutput) {
-          // プログラム返答が必要な場合 -> 直接 STEP 4 開始
-          setStepState(4, 'active');
-          setTimeout(() => {
-            document.getElementById('step-4').scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
-        } else {
-          // 文章返答の場合 -> お祝い完了メッセージを表示して終了
-          completionMessage.classList.remove('hidden');
-          setTimeout(() => {
-            completionMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
-        }
+        handleStep3Transition();
 
         setTimeout(() => {
           copyPromptBtn.textContent = origText;
@@ -404,13 +389,110 @@ ${slimJsonText}
       });
   });
 
+  // プロンプトをテキストファイルとしてダウンロード保存
+  downloadPromptBtn.addEventListener('click', () => {
+    if (!promptOutput.textContent) return;
+
+    try {
+      const blob = new Blob([promptOutput.textContent], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      
+      // 元のファイル名からベース名を取得
+      const baseName = originalFileName ? originalFileName.substring(0, originalFileName.lastIndexOf('.')) : 'project';
+      a.download = `しつもん_${baseName}.txt`;
+      
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // 遷移処理を実行
+      handleStep3Transition();
+
+    } catch (err) {
+      alert('ファイルの保存にしっぱいしたよ: ' + err.message);
+    }
+  });
+
+  function handleStep3Transition() {
+    // 状態遷移: STEP 3 完了
+    setStepState(3, 'completed');
+
+    const selectedRadio = document.querySelector('input[name="template"]:checked');
+    const selectedTemplate = selectedRadio ? selectedRadio.value : 'bug-find';
+    const isCodeOutput = (selectedTemplate === 'bug-fix' || selectedTemplate === 'improve' || selectedTemplate === 'custom-fix');
+
+    if (isCodeOutput) {
+      // プログラム返答が必要な場合 -> 直接 STEP 4 開始
+      setStepState(4, 'active');
+      setTimeout(() => {
+        document.getElementById('step-4').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } else {
+      // 文章返答の場合 -> お祝い完了メッセージを表示して終了
+      completionMessage.classList.remove('hidden');
+      setTimeout(() => {
+        completionMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
+  // ==========================================
+  // STEP 4: AIがくれたファイルを読み込む処理（ドラッグ＆ドロップ対応）
+  // ==========================================
+  jsonDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    jsonDropZone.classList.add('dragover');
+  });
+
+  jsonDropZone.addEventListener('dragleave', () => {
+    jsonDropZone.classList.remove('dragover');
+  });
+
+  jsonDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    jsonDropZone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleJsonFile(files[0]);
+    }
+  });
+
+  jsonDropZone.addEventListener('click', () => {
+    jsonFileInput.click();
+  });
+
+  jsonFileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      handleJsonFile(e.target.files[0]);
+    }
+  });
+
+  function handleJsonFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const text = e.target.result;
+      modifiedJsonInput.value = text;
+      
+      // ドロップゾーンの表示を完了にする
+      jsonDropZone.innerHTML = `
+        <span style="color: var(--color-success);">✓</span> <strong>「${file.name}」</strong> を読みこんだよ！
+      `;
+      jsonDropZone.style.borderColor = 'var(--color-success)';
+      jsonDropZone.style.backgroundColor = 'rgba(16, 185, 129, 0.05)';
+    };
+    reader.readAsText(file);
+  }
+
   // ==========================================
   // STEP 4: 再エンコード & ダウンロード処理 & 完了表示
   // ==========================================
   downloadSb3Btn.addEventListener('click', async () => {
     const rawJsonInput = modifiedJsonInput.value.trim();
     if (!rawJsonInput) {
-      alert('AIがなおしてくれたプログラムを貼りつけてね。');
+      alert('AIがなおしてくれたプログラムを貼りつけるか、ファイルを読みこんでね。');
       return;
     }
 
@@ -542,6 +624,14 @@ ${slimJsonText}
     // テキストエリア等のクリア
     modifiedJsonInput.value = '';
     promptOutput.textContent = '';
+
+    // JSONドロップゾーンのリセット
+    jsonDropZone.innerHTML = `
+      <span>📄</span> AIがくれたテキストファイルをここにドロップするか、ここをクリックしてえらんでね
+    `;
+    jsonDropZone.style.borderColor = 'var(--border-color)';
+    jsonDropZone.style.backgroundColor = 'transparent';
+    jsonFileInput.value = '';
 
     // 非表示化
     document.getElementById('step-4').classList.add('hidden');

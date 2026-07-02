@@ -816,6 +816,75 @@ select:focus {
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
+/* STEP 4用のJSONファイルドロップゾーン */
+.json-drop-zone {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.json-drop-zone span {
+  font-size: 1.5rem;
+}
+
+.json-drop-zone:hover, .json-drop-zone.dragover {
+  border-color: var(--color-accent);
+  background-color: rgba(139, 92, 246, 0.05);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.or-divider {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  position: relative;
+  margin: 1.2rem 0;
+  font-family: var(--font-title);
+  font-weight: 600;
+}
+
+.or-divider::before, .or-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.or-divider::before {
+  left: 0;
+}
+
+.or-divider::after {
+  right: 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+
 
 
 
